@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition Calculator - Free Food Recipe Analyzer</title>
+    <meta name="description" content="Simply paste the ingredients of your dish, and our tool will quickly provide a comprehensive breakdown of calories, fats, proteins, and more.">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Nutrition Calculator</h1>
+            <p class="subtitle">Simply paste your recipe ingredients and get instant nutritional insights</p>
+        </header>
+
+        <main class="main-content">
+            <div class="input-section">
+                <h2>Recipe Ingredients</h2>
+                <p class="help-text">
+                    Paste your ingredients below (one per line). Include quantities when possible:
+                    <br><small>Example: "2 cups rice", "100g chicken breast", "1 tbsp olive oil"</small>
+                </p>
+                <textarea 
+                    id="ingredientsInput" 
+                    class="ingredients-textarea"
+                    placeholder="2 cups cooked white rice&#10;150g grilled chicken breast&#10;1 tbsp olive oil&#10;1 cup broccoli&#10;1 tsp salt"
+                    rows="10"
+                ></textarea>
+                <div class="button-group">
+                    <button id="calculateBtn" class="btn btn-primary">Calculate Nutrition</button>
+                    <button id="clearBtn" class="btn btn-secondary">Clear</button>
+                    <button id="exampleBtn" class="btn btn-secondary">Load Example</button>
+                </div>
+            </div>
+
+            <div class="results-section" id="resultsSection">
+                <h2>Nutritional Breakdown</h2>
+                <div id="loading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Analyzing ingredients...</p>
+                </div>
+                
+                <div id="results" class="results-content">
+                    <p class="placeholder-text">Enter ingredients above and click "Calculate Nutrition" to see results</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>
+                Powered by <a href="https://www.opennutrition.app/" target="_blank" rel="noopener">OpenNutrition Dataset</a>
+                | Free and Open Source
+            </p>
+        </footer>
+    </div>
+
+    <script src="nutrition-data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
