@@ -61,33 +61,35 @@ class NutritionCalculator {
         line = line.trim().toLowerCase();
         if (!line) return null;
         
-        // Regex to match patterns like "2 cups rice" or "150g chicken" or "1 medium tomato"
-        const patterns = [
-            // Number + unit (one or two words) + ingredient (e.g., "2 cups rice", "1 fluid ounce oil")
-            /^(\d+(?:\.\d+)?)\s+([a-z]+(?:\s+[a-z]+)?)\s+(.+)$/,
-            // Number + ingredient (e.g., "2 eggs")
-            /^(\d+(?:\.\d+)?)\s+(.+)$/,
-            // Just ingredient (e.g., "salt")
-            /^(.+)$/
-        ];
-        
-        let match;
         let quantity = 1;
         let unit = null;
         let ingredientName = line;
         
-        // Try pattern 1: number + unit + ingredient
-        match = line.match(patterns[0]);
-        if (match) {
-            quantity = parseFloat(match[1]);
-            unit = match[2];
-            ingredientName = match[3];
-        } else {
-            // Try pattern 2: number + ingredient
-            match = line.match(patterns[1]);
-            if (match) {
-                quantity = parseFloat(match[1]);
-                ingredientName = match[2];
+        // Try to extract a leading number
+        const numberMatch = line.match(/^(\d+(?:\.\d+)?)/);
+        if (numberMatch) {
+            quantity = parseFloat(numberMatch[1]);
+            // Remove the number from the line
+            let remainder = line.substring(numberMatch[0].length).trim();
+            
+            // Check all known units to see if the remainder starts with one
+            const unitKeys = Object.keys(UNIT_CONVERSIONS);
+            let foundUnit = false;
+            
+            for (let unitKey of unitKeys) {
+                // Check if remainder starts with this unit (with optional space)
+                if (remainder.startsWith(unitKey + ' ') || remainder === unitKey) {
+                    unit = unitKey;
+                    // Remove the unit from remainder to get ingredient name
+                    ingredientName = remainder.substring(unitKey.length).trim();
+                    foundUnit = true;
+                    break;
+                }
+            }
+            
+            // If no unit was found, treat remainder as ingredient name
+            if (!foundUnit) {
+                ingredientName = remainder;
             }
         }
         
@@ -97,16 +99,18 @@ class NutritionCalculator {
             .trim();
         
         // Convert to grams
-        let grams = 100; // default
-        if (unit && UNIT_CONVERSIONS[unit]) {
-            // Unit is specified (e.g., "cups", "tbsp", "g")
-            grams = quantity * UNIT_CONVERSIONS[unit];
-        } else if (!unit && quantity > 1) {
-            // No unit specified, assume pieces (e.g., "4 eggs" = 4 pieces)
-            // Use the "piece" conversion if available, otherwise 100g per piece
-            grams = quantity * (UNIT_CONVERSIONS['piece'] || 100);
-        } else if (!unit && quantity === 1) {
-            // Single item with no unit - still use piece conversion
+        let grams = 100; // default for unmeasured ingredient
+        if (unit) {
+            // Unit is specified - look up conversion
+            const conversionFactor = UNIT_CONVERSIONS[unit];
+            if (conversionFactor) {
+                grams = quantity * conversionFactor;
+            } else {
+                // Unit not recognized; assume 100g per unit as fallback
+                grams = quantity * 100;
+            }
+        } else {
+            // No unit specified - assume pieces (e.g., "4 eggs" = 4 pieces @ 100g each)
             grams = quantity * (UNIT_CONVERSIONS['piece'] || 100);
         }
         
@@ -169,6 +173,8 @@ class NutritionCalculator {
             original: parsed.original,
             matchedName: found.name,
             grams: parsed.grams,
+            quantity: parsed.quantity,
+            unit: parsed.unit,
             calories: (found.data.calories * multiplier).toFixed(1),
             protein: (found.data.protein * multiplier).toFixed(1),
             carbs: (found.data.carbs * multiplier).toFixed(1),
@@ -260,10 +266,11 @@ class NutritionCalculator {
         
         for (let ingredient of ingredients) {
             if (ingredient.found) {
+                const unitDisplay = ingredient.unit ? ` (${ingredient.quantity} ${ingredient.unit})` : ` (${ingredient.quantity} pieces)`;
                 html += `
                     <div class="ingredient-item">
                         <div class="ingredient-name">${ingredient.matchedName}</div>
-                        <div class="ingredient-amount">${ingredient.grams}g • ${ingredient.original}</div>
+                        <div class="ingredient-amount">${Math.round(ingredient.grams)}g${unitDisplay} • ${ingredient.original}</div>
                         <div class="ingredient-nutrition">
                             <span>🔥 ${ingredient.calories} cal</span>
                             <span>🥩 ${ingredient.protein}g protein</span>
