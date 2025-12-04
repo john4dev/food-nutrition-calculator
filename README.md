@@ -1,4 +1,4 @@
-# 🥗 Food Nutrition Calculator
+# 🥗 Food Calorie Counter
 
 A free, embeddable food recipe nutrition calculator that provides instant nutritional breakdowns. Paste the ingredients of your dish (one per line) and get totals for calories, protein, carbs, fat, and fiber, plus per-ingredient details.
 

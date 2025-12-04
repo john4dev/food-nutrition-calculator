@@ -63,8 +63,8 @@ class NutritionCalculator {
         
         // Regex to match patterns like "2 cups rice" or "150g chicken" or "1 medium tomato"
         const patterns = [
-            // Number + unit + ingredient (e.g., "2 cups rice")
-            /^(\d+(?:\.\d+)?)\s*([a-z]+)\s+(.+)$/,
+            // Number + unit (one or two words) + ingredient (e.g., "2 cups rice", "1 fluid ounce oil")
+            /^(\d+(?:\.\d+)?)\s+([a-z]+(?:\s+[a-z]+)?)\s+(.+)$/,
             // Number + ingredient (e.g., "2 eggs")
             /^(\d+(?:\.\d+)?)\s+(.+)$/,
             // Just ingredient (e.g., "salt")
@@ -96,13 +96,25 @@ class NutritionCalculator {
             .replace(/\b(small|medium|large|extra large|whole|chopped|diced|sliced|minced|cooked|raw|fresh|dried|frozen)\b/g, '')
             .trim();
         
+        // Clean up unit if present
+        if (unit) {
+            unit = unit.trim();
+        }
+        
         // Convert to grams
-        let grams = 100; // default
-        if (unit && UNIT_CONVERSIONS[unit]) {
-            grams = quantity * UNIT_CONVERSIONS[unit];
-        } else if (!unit && quantity) {
-            // If just a number, assume pieces (default 100g per piece)
-            grams = quantity * 100;
+        let grams = 100; // default for unmeasured ingredient
+        if (unit) {
+            // Unit is specified - look up conversion
+            const conversionFactor = UNIT_CONVERSIONS[unit];
+            if (conversionFactor) {
+                grams = quantity * conversionFactor;
+            } else {
+                // Unit not recognized; assume 100g per unit as fallback
+                grams = quantity * 100;
+            }
+        } else {
+            // No unit specified - assume pieces (e.g., "4 eggs" = 4 pieces @ 100g each)
+            grams = quantity * (UNIT_CONVERSIONS['piece'] || 100);
         }
         
         return {
