@@ -96,24 +96,17 @@ class NutritionCalculator {
             .replace(/\b(small|medium|large|extra large|whole|chopped|diced|sliced|minced|cooked|raw|fresh|dried|frozen)\b/g, '')
             .trim();
         
-        // Clean up unit if present
-        if (unit) {
-            unit = unit.trim();
-        }
-        
         // Convert to grams
-        let grams = 100; // default for unmeasured ingredient
-        if (unit) {
-            // Unit is specified - look up conversion
-            const conversionFactor = UNIT_CONVERSIONS[unit];
-            if (conversionFactor) {
-                grams = quantity * conversionFactor;
-            } else {
-                // Unit not recognized; assume 100g per unit as fallback
-                grams = quantity * 100;
-            }
-        } else {
-            // No unit specified - assume pieces (e.g., "4 eggs" = 4 pieces @ 100g each)
+        let grams = 100; // default
+        if (unit && UNIT_CONVERSIONS[unit]) {
+            // Unit is specified (e.g., "cups", "tbsp", "g")
+            grams = quantity * UNIT_CONVERSIONS[unit];
+        } else if (!unit && quantity > 1) {
+            // No unit specified, assume pieces (e.g., "4 eggs" = 4 pieces)
+            // Use the "piece" conversion if available, otherwise 100g per piece
+            grams = quantity * (UNIT_CONVERSIONS['piece'] || 100);
+        } else if (!unit && quantity === 1) {
+            // Single item with no unit - still use piece conversion
             grams = quantity * (UNIT_CONVERSIONS['piece'] || 100);
         }
         
