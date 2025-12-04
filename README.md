@@ -1,4 +1,4 @@
-# 🥗 Food Calorie Counter
+# 🥗 Food Nutrition Calculator
 
 A free, embeddable food recipe nutrition calculator that provides instant nutritional breakdowns. Paste the ingredients of your dish (one per line) and get totals for calories, protein, carbs, fat, and fiber, plus per-ingredient details.
 
@@ -40,7 +40,7 @@ Then open http://localhost:8000.
   width="100%" 
   height="800" 
   frameborder="0"
-  title="Food Calorie Counter">
+  title="Food Nutrition Calculator">
 </iframe>
 ```
 
@@ -52,7 +52,7 @@ Or embed from local server:
   width="100%" 
   height="800" 
   frameborder="0"
-  title="Food Calorie Counter">
+  title="Food Nutrition Calculator">
 </iframe>
 ```
 
