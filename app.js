@@ -65,12 +65,11 @@ class NutritionCalculator {
         let unit = null;
         let ingredientName = line;
         
-        // Try to extract a leading number
-        const numberMatch = line.match(/^(\d+(?:\.\d+)?)/);
-        if (numberMatch) {
-            quantity = parseFloat(numberMatch[1]);
-            // Remove the number from the line
-            let remainder = line.substring(numberMatch[0].length).trim();
+        // Try to extract a leading number (e.g., "150g chicken" or "2 cups rice")
+        const leadingNumberMatch = line.match(/^(\d+(?:\.\d+)?)/);
+        if (leadingNumberMatch) {
+            quantity = parseFloat(leadingNumberMatch[1]);
+            let remainder = line.substring(leadingNumberMatch[0].length).trim();
             
             // Check all known units to see if the remainder starts with one
             const unitKeys = Object.keys(UNIT_CONVERSIONS);
@@ -90,6 +89,30 @@ class NutritionCalculator {
             // If no unit was found, treat remainder as ingredient name
             if (!foundUnit) {
                 ingredientName = remainder;
+            }
+        } else {
+            // No leading number, check for trailing number+unit (e.g., "chicken 150g" or "salt 1 tsp")
+            const trailingMatch = line.match(/^(.+?)\s+(\d+(?:\.\d+)?)\s*([a-z]+(?:\s+[a-z]+)?)$/);
+            if (trailingMatch) {
+                ingredientName = trailingMatch[1].trim();
+                quantity = parseFloat(trailingMatch[2]);
+                
+                // Check if the unit part is a valid unit
+                const potentialUnit = trailingMatch[3].trim();
+                const unitKeys = Object.keys(UNIT_CONVERSIONS);
+                
+                for (let unitKey of unitKeys) {
+                    if (unitKey === potentialUnit) {
+                        unit = unitKey;
+                        break;
+                    }
+                }
+                
+                // If unit wasn't recognized, include it in ingredient name
+                if (!unit) {
+                    ingredientName = line;
+                    quantity = 1;
+                }
             }
         }
         
