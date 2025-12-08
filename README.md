@@ -1,4 +1,4 @@
-# 🥗 Food Calorie Counter
+# 🥗 Food Nutrition Calculator
 
 A free, embeddable food recipe nutrition calculator that provides instant nutritional breakdowns. Paste the ingredients of your dish (one per line) and get totals for calories, protein, carbs, fat, and fiber, plus per-ingredient details.
 
@@ -10,51 +10,6 @@ A free, embeddable food recipe nutrition calculator that provides instant nutrit
 - Mobile-friendly responsive design
 - Client-side only (no servers, no API keys)
 - Easy to embed via iframe
-
-## 🚀 Quick Start
-
-### Option 1: Open directly
-
-Open `index.html` in your browser.
-
-### Option 2: Serve locally
-
-```powershell
-# Python
-python -m http.server 8000
-
-# Node (http-server)
-npx http-server
-
-# PHP
-php -S localhost:8000
-```
-
-Then open http://localhost:8000.
-
-## 📦 Embed in your website
-
-```html
-<iframe 
-  src="https://your-username.github.io/food-calorie-counter/" 
-  width="100%" 
-  height="800" 
-  frameborder="0"
-  title="Food Calorie Counter">
-</iframe>
-```
-
-Or embed from local server:
-
-```html
-<iframe 
-  src="http://localhost:8000/" 
-  width="100%" 
-  height="800" 
-  frameborder="0"
-  title="Food Calorie Counter">
-</iframe>
-```
 
 ## 🗂️ Project structure
 
